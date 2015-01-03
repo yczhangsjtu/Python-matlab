@@ -52,6 +52,7 @@ funcmap = \
 {\
     "disp":"printl",\
     "linspace":"linspace",\
+    "logspace":"logspace",\
     "outer":"outer",\
     "ones":"ones",\
     "size":"size",\
@@ -77,6 +78,108 @@ funcmap = \
     "polyval":"polyval",\
     "poly1d":"poly1d",\
     "polyfit":"polyfit",\
+    "array":"array",\
+    "range":"range",\
+    "arange":"arange",\
+    "array2string":"array2string",\
+    "set_printoptions":"set_printoptions",\
+    "get_printoptions":"get_printoptions",\
+    "equal":"equal",\
+    "not_equal":"not_equal",\
+    "greater_equal":"greater_equal",\
+    "less_equal":"less_equal",\
+    "greater":"greater",\
+    "less":"less",\
+    "str_len":"char.str_len",\
+    "add":"add",\
+    "multiply":"multiply",\
+    "mod":"mod",\
+    "capitalize":"char.capitalize",\
+    "center":"char.center",\
+    "count":"char.count",\
+    "encode":"char.encode",\
+    "decode":"char.decode",\
+    "endswith":"char.endswith",\
+    "expandtabs":"char.expandtabs",\
+    "find":"char.find",\
+    "index":"char.index",\
+    "isalnum":"char.isalnum",\
+    "isalpha":"char.isalpha",\
+    "isdigit":"char.isdigit",\
+    "islower":"char.islower",\
+    "isspace":"char.isspace",\
+    "istitle":"char.istitle",\
+    "isupper":"char.isupper",\
+    "join":"char.join",\
+    "ljust":"char.ljust",\
+    "lower":"char.lower",\
+    "lstrip":"char.lstrip",\
+    "spartition":"char.partition",\
+    "replace":"char.replace",\
+    "rfind":"char.rfind",\
+    "rindex":"char.rindex",\
+    "rjust":"char.rjust",\
+    "rpartition":"char.rpartition",\
+    "rsplit":"char.rsplit",\
+    "rstrip":"char.rstrip",\
+    "split":"char.split",\
+    "splitlines":"char.splitlines",\
+    "startswith":"char.startswith",\
+    "strip":"char.strip",\
+    "swapcase":"char.swapcase",\
+    "title":"char.title",\
+    "translate":"char.translate",\
+    "upper":"char.upper",\
+    "zfill":"char.zfill",\
+    "isnumeric":"char.isnumeric",\
+    "isdecimal":"char.isdecimal",\
+    "take":"take",\
+    "reshape":"reshape",\
+    "choose":"choose",\
+    "repeat":"repeat",\
+    "put":"put",\
+    "swapaxes":"swapaxes",\
+    "transpose":"transpose",\
+    "partition":"partition",\
+    "sort":"sort",\
+    "argsort":"argsort",\
+    "argmax":"argmax",\
+    "argmin":"argmin",\
+    "searchsorted":"searchsorted",\
+    "resize":"resize",\
+    "squeeze":"squeeze",\
+    "diagonal":"diagonal",\
+    "trace":"trace",\
+    "ravel":"ravel",\
+    "eye":"eye",\
+    "nonzero":"nonzero",\
+    "shape":"shape",\
+    "compress":"compress",\
+    "clip":"clip",\
+    "sum":"sum",\
+    "product":"product",\
+    "sometrue":"sometrue",\
+    "alltrue":"alltrue",\
+    "any":"any",\
+    "all":"all",\
+    "cumsum":"cumsum",\
+    "cumproduct":"cumproduct",\
+    "ptp":"ptp",\
+    "amax":"amax",\
+    "amin":"amin",\
+    "alen":"alen",\
+    "prod":"prod",\
+    "cumprod":"cumprod",\
+    "ndim":"ndim",\
+    "rank":"rank",\
+    "size":"size",\
+    "around":"around",\
+    "mean":"mean",\
+    "std":"std",\
+    "var":"var",\
+    "finfo":"finfo",\
+    "iinfo":"iinfo",\
+    "empty":"empty",\
     "quit":"quit",\
     "plot":"pylab.plot",\
     "subplot":"pylab.subplot",\
@@ -85,6 +188,7 @@ cmdmap = \
 {\
     "quit":"quit()",\
     "cl":"clear()",\
+    "get_printoptions":"get_printoptions()",\
 }
 #-------------------------------------------------------------------------------
 # Regular expressions to parse the matlab command
@@ -137,6 +241,7 @@ def printPrompt(): # Print prompt
     output(">> ")
     # Move the mark of "fixed" area to the end of the prompt
     cmdstart = out.index(END+"-1c")
+    gotoEnd()
 
 def ready(): # Work to do when entering ready state
     printPrompt()
