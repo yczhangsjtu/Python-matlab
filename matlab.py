@@ -2,29 +2,29 @@
 """
 A Simple Python Implementation of Matlab
 
--------------------------------------------------------------------------------|
-|         |                               |                                    |
-|         |                               |                                    |
-|    C    |                               |                                    |
-|    O    |                               |                                    |
-|    N    |                               |                                    |
-|    T    |                               |                                    |
-|    R    |                               |                                    |
-|    O    |                               |                                    |
-|    L    |                               |                                    |
-|         |                               |                                    |
-|    B    |        OUTPUT AREA            |        FIGURE SHOWN HERE           |
-|    U    |                               |                                    |
-|    T    |        (readonly textbox)     |        (canvas)                    |
-|    T    |                               |                                    |
-|    O    |                               |                                    |
-|    N    |                               |                                    |
-|    S    |                               |                                    |
-|(buttons)|                               |                                    |
-|(frame)  |                               |                                    |
-|         |                               |                                    |
-|         |                               |                                    |
--------------------------------------------------------------------------------|
+----------------------------------------------------------------------
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|        OUTPUT AREA            |        FIGURE SHOWN HERE           |
+|                               |                                    |
+|        (readonly textbox)     |        (canvas)                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+|                               |                                    |
+----------------------------------------------------------------------
 """
 ################################################################################
 from __future__ import division
@@ -34,6 +34,7 @@ from numpy import *
 import matplotlib.image as mpimg
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d import axes3d
+import matplotlib.image as mpimg
 from PIL import Image, ImageTk
 import string
 import re
@@ -180,39 +181,57 @@ funcmap = \
     "finfo":"finfo",\
     "iinfo":"iinfo",\
     "empty":"empty",\
-    "quit":"quit",\
+    "fromstring":"fromstring",\
+    "fromfile":"fromfile",\
+    "frombuffer":"frombuffer",\
+    "zeros":"zeros",\
+    "count_nonzero":"count_nonzero",\
+    "copyto":"copyto",\
+    "concatenate":"concatenate",\
+    "script":"script",\
+    "quit":"exit",\
+    "imread":"mpimg.imread",\
+    "imshow":"pylab.imshow",\
     "plot":"pylab.plot",\
+    "len":"len",\
+    "clf":"pylab.clf",\
     "subplot":"pylab.subplot",\
+    "plot_surface":"ax.plot_surface",\
 }
 cmdmap = \
 {\
-    "quit":"quit()",\
+    "quit":"exit()",\
     "cl":"clear()",\
     "get_printoptions":"get_printoptions()",\
+    "end":"end()",\
 }
 #-------------------------------------------------------------------------------
 # Regular expressions to parse the matlab command
 #-------------------------------------------------------------------------------
 # Some often used regular expressions
-varletters = r"_%s%s"%(string.ascii_letters,string.digits)
+varletters = r"_%s%s\[\]"%(string.ascii_letters,string.digits)
 varbletters = r"_%s"%(string.ascii_letters) # Digit cannot start a variable name
 varname = r"[%s][%s]*"%(varbletters,varletters)
-operators = r"\+\-\*\/\^\(\)"
+operators = r"\+\-\*\/\^\(\)\s"
+whites = r"[%s]*"%(string.whitespace)
 # Match invoking function
 # func(arguments)
-refunc = r"^(%s)\((.*)\);?$"%varname
+refunc = r"^%s(%s)\((.*)\);?$"%(whites,varname)
 # Match assign return value of a function to variable
 # var = func(arguments)
-reassignfunc = r"^(%s)\s*=\s*(%s)\((.*)\);?$"%(varname, varname)
+reassignfunc = r"^%s(%s)\s*=\s*(%s)\((.*)\);?$"%(whites,varname, varname)
 # Match commands consisting of only white characters
 rewhite = r"^[%s]+$"%(string.whitespace)
 # Match commands or variable names with no ()
 # variable / function
-rename = r"^(%s);?$"%(varname)
+rename = r"^%s(%s);?$"%(whites,varname)
 # Match a math expression
-rearithm = r"^([%s%s]+);?$"%(varletters,operators)
+rearithm = r"^%s([%s%s]+);?$"%(whites,varletters,operators)
 # Match assign math expression to variable
-reassignarithm = r"^(%s)\s*=\s*([%s%s]+);?$"%(varname,varletters,operators)
+reassignarithm =\
+r"^%s(%s)\s*=\s*([%s%s]+);?$"%(whites,varname,varletters,operators)
+# Match for loop
+reforloop = r"^%sfor\s+(%s)\s*=(.*)$"%(whites,varname)
 ################################################################################
 ####################### STATE VARIABLES ########################################
 ################################################################################
@@ -220,9 +239,21 @@ history = []
 phist = 0
 cmdstart = "1,0"
 ans = None
+ax = None
+cand = []
+pcand = 0
+# Depth of loop/if ..
+depth = 0
+# script buffer
+scriptBuf = ""
+toGlobalVars = []
 ################################################################################
 ####################### OTHER FUNCTIONS ########################################
 ################################################################################
+def exit():
+    saveHistory("history.m")
+    quit()
+
 def gotoEnd(): # Move cursor to the end
     out.mark_set(INSERT,END)
 
@@ -238,7 +269,10 @@ def printl(s): # Print a line in the text area
 
 def printPrompt(): # Print prompt
     global cmdstart
-    output(">> ")
+    if depth == 0:
+        output(">> ")
+    else:
+        output("---%s"%("----"*depth))
     # Move the mark of "fixed" area to the end of the prompt
     cmdstart = out.index(END+"-1c")
     gotoEnd()
@@ -278,6 +312,14 @@ def indexSmallerEqual(i1, i2):
     else:
         return False
 
+# Open script file and execute
+def script(filename):
+    with open(filename) as f:
+        cmds = f.readlines()
+        for c in cmds:
+            if c[-1] == "\n": c = c[:-1]
+            process(c)
+
 def getCommand(): # Get the command(text after the prompt) from text area
     return out.get(cmdstart,out.index(END+"-1c"))
 
@@ -285,19 +327,44 @@ def delchar(): # Delete one character at the end of the text area
     out.delete(END+"-2c",END+"-1c")
 
 def keyPress(event): # When any key is pressed
+    # These are used in tab completion, erased whichever key is pressed
+    global cand, pcand
     # If the cursor is in the fixed area, go to the end
     # Note that we can't always let the cursor go to the end, or one would be
     # unable to insert something in the middle of the command line
     if indexSmaller(out.index(INSERT),cmdstart):
         gotoEnd()
+    cand = []
+    pcand = -1
+
+def isEndCommand(s):
+    g = re.match("^%send?%s$"%(whites,whites),s)
+    if g:
+        return True
+    else:
+        return False
 
 def returnPress(event): # When pressing enter
+    # These are used in tab completion, erased whichever key is pressed
+    global cand, pcand
+    cand = []
+    pcand = -1
     cmd = getCommand() # Get the command line
+    # If the command is "end", unintend it for elegacy
+    if isEndCommand(cmd) and depth > 0:
+        for i in range(7):
+            delchar()
+        output("end")
+    printl("")
     process(cmd) # Process command
     ready() # Enter ready state
     return "break" # Prevent the text area from calling its own callback
 
 def backPress(event): # When backspace pressed
+    # These are used in tab completion, erased whichever key is pressed
+    global cand, pcand
+    cand = []
+    pcand = -1
     if indexSmallerEqual(out.index(INSERT),cmdstart):
         if indexSmaller(out.index(INSERT),cmdstart):
             gotoEnd() # Go to end of the text area
@@ -308,6 +375,10 @@ def deleteCommand(): # Delete until prompt ">>"
         delchar()
 
 def upPress(event): # When up arrow is pressed
+    # These are used in tab completion, erased whichever key is pressed
+    global cand, pcand
+    cand = []
+    pcand = -1
     global phist # Pointer to history command
     if phist > 0: # Decrement pointer by one until 0
         phist -= 1
@@ -319,6 +390,10 @@ def upPress(event): # When up arrow is pressed
     return "break"
 
 def downPress(event): # When up arrow is pressed, just similar to upPress
+    # These are used in tab completion, erased whichever key is pressed
+    global cand, pcand
+    cand = []
+    pcand = -1
     global phist
     if phist < len(history):
         phist += 1
@@ -327,6 +402,34 @@ def downPress(event): # When up arrow is pressed, just similar to upPress
         if phist < len(history):
             cmdline = history[phist]
             output(cmdline)
+    return "break"
+
+def tabPress(event): # When Tab is pressed, do completion
+    global cand, pcand
+    cmd = getCommand()
+    if cmd == "": return "break"
+    # pcand = -1 means there is no candidate list
+    if pcand == -1:
+        cand = [] # Build one
+        # Search through all function names and commands and select those
+        # with the current prefix
+        for c in funcmap.keys():
+            if c.startswith(cmd):
+                cand.append(c)
+        for c in cmdmap.keys():
+            if c.startswith(cmd):
+                cand.append(c)
+        # Set pointer points to the first candidate
+        pcand = 0
+    else: # There is already one list, just increment the pointer
+        if len(cand) > 0:
+            pcand += 1
+            if pcand >= len(cand):
+                pcand = -1
+    # Do the completion
+    if pcand >= 0 and pcand < len(cand):
+        deleteCommand()
+        output(cand[pcand])
     return "break"
 
 def leftClick(event): # When left mouse clicked
@@ -342,16 +445,74 @@ def fig2img(fig): # Transform a pylab figure to a PIL image
 
 def draw(): # Plot the current figure on the canvas
     global img # Global it so that it won't be collected when this function ends
+    global ax # Axes object
     # Transform figure to PIL image, resize it to 500x500, and transform to Tk
     # photo image
     img = ImageTk.PhotoImage(fig2img(pylab.gcf()).resize((500,500)))
     # Draw the image
     cvs.create_image(250,250,image=img)
+    # If the command is subplot, then ans is an axes object now
+    if str(type(ans)) == "<class 'matplotlib.axes.Axes3DSubplot'>":
+        ax = ans
+
+def readHistory(filename): # Read history from history file
+    global history, phist
+    try:
+        with open(filename) as f:
+            hists = f.readlines()
+            for h in hists:
+                if h[-1] == "\n": h = h[:-1] # Remove the last EOL
+                history.append(h)
+        phist = len(history)
+        printl("Successfully read history file: %s\n"%filename)
+    except:
+        printl("Cannot find history file: %s"%filename)
+
+def saveHistory(filename): # Save history
+    with open(filename,"w") as f:
+        for h in history:
+            f.write("%s\n"%h)
+
+def clearHistory():
+    global history
+    history = []
+
+def logPythonScript(script):
+    global scriptBuf
+    scriptBuf += "%s%s\n"%("\t"*depth,script)
+
+def clearTempScript():
+    global scriptBuf, toGlobalVars
+    scriptBuf = ""
+    toGlobalVars = []
+
+def end():
+    global depth
+    if depth > 0:
+        depth -= 1
+        if depth == 0: # The last end, start execute
+            try:
+                exec("global %s\n%s"%(" ".join(toGlobalVars),scriptBuf))
+            except Exception as inst:
+                printl(inst)
+    else:
+        printl("Error in: end")
+        printl("Nothing to end!")
+        
+# When using exec() to execute loops, the variables are treated as local
+# so a list of variable names have to be maintained and before using
+# exec() they are declared global first
+def toGlobal(var):
+    global toGlobalVars
+    g = re.match("^([a-zA-Z0-9_]+).*$",var)
+    if g:
+        if not g.group(1) in toGlobalVars:
+            toGlobalVars.append(g.group(1))
 
 def process(cmd): # Process command line
     global history,phist # Need to alter the command history
     global ans # The result of the previous command
-    printl("") # Change line first
+    global depth
     if cmd == "": return # If command line is empty, do nothing
 
     # Go through all the command patterns and parse the command line with those
@@ -372,19 +533,22 @@ def process(cmd): # Process command line
             pcmd = "%s(%s)"%(pfunc,g.group(2)) # Parse arguments
         else:
             pcmd = "%s()"%(pfunc) # Called with no arguments
-        try:
-            ans = eval(pcmd) # Evaluate python command and keep the result
-            # If there is pylab, draw the current figure to the canvas
-            if pfunc[:6] == "pylab.": 
-                draw()
-            else: # Or just print the result (unless None or ';' is used)
-                if ans is not None and cmd[-1]!=";": printl(ans)
-        except Exception as inst:
-            printl("Error in: %s"%cmd)
-            printl("Translated python: %s"%pcmd)
-            printl(inst)
-        history.append(cmd) # Record command
-        phist = len(history) # Pointer point to the end of history list
+        if depth == 0: # Evaluate the command only when depth = 0
+            try:
+                ans = eval(pcmd) # Evaluate python command and keep the result
+                # If there is pylab, draw the current figure to the canvas
+                if pfunc[:6] == "pylab." or pfunc[:3] == "ax.": 
+                    draw()
+                else: # Or just print the result (unless None or ';' is used)
+                    if ans is not None and cmd[-1]!=";": printl(ans)
+            except Exception as inst:
+                printl("Error in: %s"%cmd)
+                printl("Translated python: %s"%pcmd)
+                printl(inst)
+            history.append(cmd) # Record command
+            phist = len(history) # Pointer point to the end of history list
+        else: # Else, just remember the command, and execute it until end
+            logPythonScript(pcmd)
         return
 
     # x = func(args)
@@ -397,59 +561,82 @@ def process(cmd): # Process command line
             printl("Error in: %s"%cmd)
             printl("%s: No such function"%g.group(2))
             printl(inst)
-        if g.group(3):
-            pcmd = "%s(%s)"%(pfunc,g.group(3))
-        else:
-            pcmd = "%s()"%(pfunc)
-        try:
-            ans = eval(pcmd)
-            globals().update([[var,ans]]) # Assignment of variable
-            if pfunc[:6] == "pylab.":
-                draw()
+        if depth == 0:
+            if g.group(3):
+                pcmd = "global %s\n%s=%s(%s)"%(var,var,pfunc,g.group(3))
             else:
-                if ans is not None and cmd[-1]!=";": printl(ans)
-        except Exception as inst:
-            printl("Error in: %s"%cmd)
-            printl("Translated python: %s"%pcmd)
-            printl(inst)
-        history.append(cmd)
-        phist = len(history)
-        return
-    # Match a single name
-    g = re.match(rename,cmd)
-    if g:
-        var = g.group(1)
-        if var in cmdmap:
+                pcmd = "global %s\n%s=%s()"%(var,var,pfunc)
             try:
-                pfunc = cmdmap[var]
-                ans = eval(pfunc)
-                if pfunc[:6] == "pylab.":
+                exec(pcmd)
+                ans = eval(var)
+                if pfunc[:6] == "pylab." or pfunc[:3] == "ax.":
                     draw()
                 else:
                     if ans is not None and cmd[-1]!=";": printl(ans)
             except Exception as inst:
                 printl("Error in: %s"%cmd)
+                printl("Translated python: %s"%pcmd)
                 printl(inst)
-                return
+            history.append(cmd)
+            phist = len(history)
+        else:
+            if g.group(3):
+                pcmd = "%s=%s(%s)"%(var,var,pfunc,g.group(3))
+            else:
+                pcmd = "%s=%s()"%(var,var,pfunc)
+            toGlobal(var)
+            logPythonScript(pcmd)
+        return
+
+    if isEndCommand(cmd):
+        end()
+        return
+
+    # Match a single name
+    g = re.match(rename,cmd)
+    if g:
+        var = g.group(1)
+        pcmd = var
+        if var in cmdmap:
+            if depth == 0:
+                try:
+                    pfunc = cmdmap[var]
+                    ans = eval(pfunc)
+                    if pfunc[:6] == "pylab." or pfunc[:3] == "ax.":
+                        draw()
+                    else:
+                        if ans is not None and cmd[-1]!=";": printl(ans)
+                except Exception as inst:
+                    printl("Error in: %s"%pcmd)
+                    printl(inst)
+                    return
+            else:
+                logPythonScript(pcmd)
         else: # Try to evaluate as variable
-            try:
-                ans = eval(var)
-                if ans is not None and cmd[-1]!=";": printl(ans)
-            except Exception as inst:
-                printl("Error in: %s"%cmd)
-                printl(inst)
+            if depth == 0:
+                try:
+                    ans = eval(var)
+                    if ans is not None and cmd[-1]!=";": printl(ans)
+                except Exception as inst:
+                    printl("Error in: %s"%pcmd)
+                    printl(inst)
+            else:
+                logPythonScript(pcmd)
         return
 
     # Match math expression
     g = re.match(rearithm,cmd)
     if g:
         e = g.group(1)
-        try:
-            ans = eval(e)
-            if ans is not None and cmd[-1]!=";": printl(ans)
-        except Exception as inst:
-            printl("Error in: %s"%cmd)
-            printl(inst)
+        if depth == 0:
+            try:
+                ans = eval(e)
+                if ans is not None and cmd[-1]!=";": printl(ans)
+            except Exception as inst:
+                printl("Error in: %s"%cmd)
+                printl(inst)
+        else:
+            logPythonScript(e)
         return
 
     # Match assignment of math expression
@@ -457,13 +644,30 @@ def process(cmd): # Process command line
     if g:
         var = g.group(1)
         e = g.group(2)
-        try:
-            ans = eval(e)
-            globals().update([[var,ans]])
-            if ans is not None and cmd[-1]!=";": printl(ans)
-        except Exception as inst:
-            printl("Error in: %s"%cmd)
-            printl(inst)
+        if depth == 0:
+            pcmd = "global %s\n%s=%s"%(var,var,e)
+            try:
+                exec(pcmd)
+                ans = eval(var)
+                if ans is not None and cmd[-1]!=";": printl(ans)
+            except Exception as inst:
+                printl("Error in: %s"%cmd)
+                printl(inst)
+        else:
+            pcmd = "%s=%s"%(var,e)
+            toGlobal(var)
+            logPythonScript(pcmd)
+        return
+
+    # Match for loop
+    g = re.match(reforloop,cmd)
+    if g:
+        var = g.group(1)
+        rge = g.group(2)
+        if depth == 0:
+            clearTempScript()
+        logPythonScript("for %s in %s:"%(var,rge))
+        depth += 1
         return
 
     # Match white space
@@ -481,33 +685,23 @@ def process(cmd): # Process command line
 root = Tk()
 # root.columnconfigure(3)
 # root.rowconfigure(2)
-#----------------------BUTTONS--------------------------------------------------
-bts = Frame(root)
-bts.grid(row=0,column=0)
-bns = []
-bns.append(Button(bts,text="Button1"))
-bns[-1].grid(row=len(bns),column=0)
-bns.append(Button(bts,text="Button2"))
-bns[-1].grid(row=len(bns),column=0)
-bns.append(Button(bts,text="Button3"))
-bns[-1].grid(row=len(bns),column=0)
-bns.append(Button(bts,text="Button4"))
-bns[-1].grid(row=len(bns),column=0)
 #----------------------TEXT BOXES-----------------------------------------------
 out = Text(root,width=50,height=30)
-out.grid(row=0,column=1,sticky=E+W+S+N)
+out.grid(row=0,column=0,sticky=E+W+S+N)
 out.bind("<Key>",keyPress)
 out.bind("<Return>",returnPress)
 out.bind("<BackSpace>",backPress)
 out.bind("<Up>",upPress)
 out.bind("<Down>",downPress)
+out.bind("<Tab>",tabPress)
 out.bind("<Button-1>",leftClick)
 #----------------------Canvases-------------------------------------------------
 cvs = Canvas(root,width=500,height=500)
-cvs.grid(row=0,column=2)
+cvs.grid(row=0,column=1)
 ################################################################################
 ####################### INITIALIZATIONS ########################################
 ################################################################################
 output(greeting)
+readHistory("history.m")
 ready()
 root.mainloop()

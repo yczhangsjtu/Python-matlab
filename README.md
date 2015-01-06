@@ -13,18 +13,22 @@ The basic implementation tricks are as follows:
 
    i.   func( args ): use a map to transform func to corresponding python function, combine it again with "(%s)"%args, eval() it
 
-   ii.  var = func( args ): Same to the previous one, and then use globals().update to assign the result to the variable
+   ii.  var = func( args ): Same to the previous one, but use exec instead of eval. And a "global var" has to be added as prefix
 
    iii. math expression: Evaluate directly
 
-   iv.  var = math expression: Evaluate and use globals().update to assign result to variable
+   iv.  var = math expression: Add "global var" and then evaluate
    
    v.   command: map it to a python expression and eval()
 
 2. If the python function contains prefix "pylab.", then invoke draw function to draw the current figure on the canvas
 
-3. The text area is a Tkinter text widget. Several text processing techniques are used to make it perform like a command line.
+3. Some plot functions such as plot\_surface are methods of Axes class instead of pylab, so a global Axes object "ax" is maintained.
+
+4. The text area is a Tkinter text widget. Several text processing techniques are used to make it perform like a command line.
    Many special key callback functions are redirected.
+
+5. To implement for loop, a script buffer is used. When the loop depth is nonzero, the translated python scripts are assemblied in the buffer and the last end causes the buffer to be exec()ed. To effectivate the assignment in the script, when adding an assign expression the variable name is added to a "to be globaled" list, and before exec()ing the script, the variable list is gloabaled first.
 
 Currently supported commands:
 
@@ -290,8 +294,16 @@ empty
 
 quit
 
+imread
+
+imshow
+
 plot
+
+len
+
+clf
 
 subplot
 
-
+plot\_surface
