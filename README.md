@@ -30,6 +30,8 @@ The basic implementation tricks are as follows:
 
 5. To implement for loop, a script buffer is used. When the loop depth is nonzero, the translated python scripts are assemblied in the buffer and the last end causes the buffer to be exec()ed. To effectivate the assignment in the script, when adding an assign expression the variable name is added to a "to be globaled" list, and before exec()ing the script, the variable list is gloabaled first.
 
+6. The help documents are not completed now. Will be built little by little.
+
 Currently supported commands:
 
 disp

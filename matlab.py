@@ -45,7 +45,31 @@ import re
 # Information provided when first started
 greeting = \
 """This is a simple python implementation of matlab.
+Type "help" for any help.
+"""
+#-------------------------------------------------------------------------------
+# Help information
+HelpInfo = \
+"""
+Currently supported commands:
 
+    abs add alen all alltrue amax amin any arange arccos arcsin arctanh argmax
+    argmin argsort around array array2string capitalize center choose clf clip
+    compress concatenate copyto cos count count_nonzero cumprod cumproduct
+    cumsum decode diagonal disp empty encode endswith equal expandtabs eye find
+    finfo frombuffer fromfile fromstring get_printoptions greater greater_equal
+    iinfo imread imshow index isalnum isalpha isdecimal isdigit islower
+    isnumeric isspace istitle isupper join len less less_equal linspace ljust
+    log log10 log2 logspace lower lstrip mean mod multiply ndim nonzero
+    not_equal ones outer partition plot plot_surface poly poly1d polyadd polyder
+    polydiv polyfit polyint polymul polysub polyval power prod product ptp put
+    quit range rank ravel repeat replace reshape resize rfind rindex rjust roots
+    rpartition rsplit rstrip script searchsorted set_printoptions shape sin size
+    size sometrue sort spartition split splitlines sqrt squeeze startswith std
+    strip str_len subplot sum swapaxes swapcase take title trace translate
+    transpose upper var zeros zfill
+
+For help of specific command, type: help commandname
 """
 #-------------------------------------------------------------------------------
 # Map matlab functions to python and numpy and pylab functions
@@ -200,10 +224,11 @@ funcmap = \
 }
 cmdmap = \
 {\
-    "quit":"exit()",\
-    "cl":"clear()",\
-    "get_printoptions":"get_printoptions()",\
-    "end":"end()",\
+    "quit":"exit",\
+    "cl":"clear",\
+    "get_printoptions":"get_printoptions",\
+    "end":"end",\
+    "help":"help",\
 }
 #-------------------------------------------------------------------------------
 # Regular expressions to parse the matlab command
@@ -230,8 +255,14 @@ rearithm = r"^%s([%s%s]+);?$"%(whites,varletters,operators)
 # Match assign math expression to variable
 reassignarithm =\
 r"^%s(%s)\s*=\s*([%s%s]+);?$"%(whites,varname,varletters,operators)
+# Match command argus
+recommand =\
+r"^%s(%s)\s+%s([%s][%s\s]+[%s])%s;?$"\
+%(whites,varname,whites,varletters,varletters,varletters,whites)
 # Match for loop
 reforloop = r"^%sfor\s+(%s)\s*=(.*)$"%(whites,varname)
+# Match if
+reif = r"^%sif\s+(.*)\s+then%s$"%(whites,whites)
 ################################################################################
 ####################### STATE VARIABLES ########################################
 ################################################################################
@@ -279,6 +310,16 @@ def printPrompt(): # Print prompt
 
 def ready(): # Work to do when entering ready state
     printPrompt()
+
+def help(cmdname = None): # loop up help file of some command
+    if not cmdname:
+        printl(HelpInfo)
+        return
+    try:
+        with open("%s.hp"%cmdname) as f:
+            printl(f.read())
+    except Exception as inst:
+        printl("No help information for '%s'."%cmdname)
 
 # Compare which index is smaller
 # Indices are like 1.5 or 3.2, meaning the third row and second column
@@ -492,7 +533,10 @@ def end():
         depth -= 1
         if depth == 0: # The last end, start execute
             try:
-                exec("global %s\n%s"%(" ".join(toGlobalVars),scriptBuf))
+                if len(toGlobalVars) > 0:
+                    exec("global %s\n%s"%(" ".join(toGlobalVars),scriptBuf))
+                else:
+                    exec(scriptBuf)
             except Exception as inst:
                 printl(inst)
     else:
@@ -514,9 +558,61 @@ def process(cmd): # Process command line
     global ans # The result of the previous command
     global depth
     if cmd == "": return # If command line is empty, do nothing
+    history.append(cmd) # Record command
+    phist = len(history) # Pointer point to the end of history list
 
     # Go through all the command patterns and parse the command line with those
     # patterns. If match, process the command using that pattern
+
+
+    if isEndCommand(cmd):
+        end()
+        return
+
+    # Match for loop
+    g = re.match(reforloop,cmd)
+    if g:
+        var = g.group(1)
+        rge = g.group(2)
+        if depth == 0:
+            clearTempScript()
+        logPythonScript("for %s in %s:"%(var,rge))
+        depth += 1
+        return
+
+    # Match if
+    g = re.match(reif,cmd)
+    if g:
+        e = g.group(1)
+        if depth == 0:
+            clearTempScript()
+        logPythonScript("if %s:"%e)
+        depth += 1
+        return
+
+    # Match command with arguments
+    g = re.match(recommand,cmd)
+    if g:
+        try:
+            pfunc = cmdmap[g.group(1)]
+            argus = "\"%s\""%("\",\"".join(g.group(2).split(" ")))
+        except Exception as inst:
+            printl("Error in: %s"%cmd)
+            printl("%s: No such command"%g.group(1))
+            printl(inst)
+            return
+        pcmd = "%s(%s)"%(pfunc,argus)
+        if depth == 0:
+            try:
+                ans = eval(pcmd)
+                if ans is not None and cmd[-1]!=";": printl(ans)
+            except Exception as inst:
+                printl("Error in: %s"%cmd)
+                printl("Translated python: %s"%pcmd)
+                printl(inst)
+        else: # Else, just remember the command, and execute it until end
+            logPythonScript(pcmd)
+        return
 
     # func(args)
     g = re.match(refunc,cmd) # Do the regular expression match
@@ -545,8 +641,6 @@ def process(cmd): # Process command line
                 printl("Error in: %s"%cmd)
                 printl("Translated python: %s"%pcmd)
                 printl(inst)
-            history.append(cmd) # Record command
-            phist = len(history) # Pointer point to the end of history list
         else: # Else, just remember the command, and execute it until end
             logPythonScript(pcmd)
         return
@@ -561,6 +655,7 @@ def process(cmd): # Process command line
             printl("Error in: %s"%cmd)
             printl("%s: No such function"%g.group(2))
             printl(inst)
+            return
         if depth == 0:
             if g.group(3):
                 pcmd = "global %s\n%s=%s(%s)"%(var,var,pfunc,g.group(3))
@@ -577,8 +672,6 @@ def process(cmd): # Process command line
                 printl("Error in: %s"%cmd)
                 printl("Translated python: %s"%pcmd)
                 printl(inst)
-            history.append(cmd)
-            phist = len(history)
         else:
             if g.group(3):
                 pcmd = "%s=%s(%s)"%(var,var,pfunc,g.group(3))
@@ -586,10 +679,6 @@ def process(cmd): # Process command line
                 pcmd = "%s=%s()"%(var,var,pfunc)
             toGlobal(var)
             logPythonScript(pcmd)
-        return
-
-    if isEndCommand(cmd):
-        end()
         return
 
     # Match a single name
@@ -601,7 +690,7 @@ def process(cmd): # Process command line
             if depth == 0:
                 try:
                     pfunc = cmdmap[var]
-                    ans = eval(pfunc)
+                    ans = eval("%s()"%pfunc)
                     if pfunc[:6] == "pylab." or pfunc[:3] == "ax.":
                         draw()
                     else:
@@ -659,17 +748,6 @@ def process(cmd): # Process command line
             logPythonScript(pcmd)
         return
 
-    # Match for loop
-    g = re.match(reforloop,cmd)
-    if g:
-        var = g.group(1)
-        rge = g.group(2)
-        if depth == 0:
-            clearTempScript()
-        logPythonScript("for %s in %s:"%(var,rge))
-        depth += 1
-        return
-
     # Match white space
     g = re.match(rewhite,cmd)
     if g:
@@ -686,7 +764,7 @@ root = Tk()
 # root.columnconfigure(3)
 # root.rowconfigure(2)
 #----------------------TEXT BOXES-----------------------------------------------
-out = Text(root,width=50,height=30)
+out = Text(root,width=80,height=40)
 out.grid(row=0,column=0,sticky=E+W+S+N)
 out.bind("<Key>",keyPress)
 out.bind("<Return>",returnPress)

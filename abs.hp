@@ -1,0 +1,7 @@
+  Compute the magnitude of Z.
+
+  For example:
+
+  abs (-4.5)
+		=> 4.5
+
