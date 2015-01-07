@@ -1,0 +1,21 @@
+Return the length of the first dimension of the input array.                 
+                                                                             
+Parameters                                                                   
+----------                                                                   
+a : array_like                                                               
+   Input array.                                                              
+                                                                             
+Returns                                                                      
+-------                                                                      
+alen : int                                                                   
+   Length of the first dimension of `a`.                                     
+                                                                             
+See Also                                                                     
+--------                                                                     
+shape, size                                                                  
+                                                                             
+Examples                                                                     
+--------                                                                     
+>>> a = zeros((7,4,5))                                                              
+>>> alen(a)                                                               
+7                                                                            

@@ -1,0 +1,50 @@
+Return the minimum of an array or minimum along an axis.                     
+                                                                             
+Parameters                                                                   
+----------                                                                   
+a : array_like                                                               
+    Input data.                                                              
+axis : int, optional                                                         
+    Axis along which to operate.  By default, flattened input is used.       
+out : ndarray, optional                                                      
+    Alternative output array in which to place the result.  Must             
+    be of the same shape and buffer length as the expected output.           
+    See `doc.ufuncs` (Section "Output arguments") for more details.          
+keepdims : bool, optional                                                    
+    If this is set to True, the axes which are reduced are left              
+    in the result as dimensions with size one. With this option,             
+    the result will broadcast correctly against the original `arr`.          
+                                                                             
+Returns                                                                      
+-------                                                                      
+amin : ndarray or scalar                                                     
+    Minimum of `a`. If `axis` is None, the result is a scalar value.         
+    If `axis` is given, the result is an array of dimension                  
+    ``a.ndim - 1``.                                                         
+Notes                                                                        
+-----                                                                        
+NaN values are propagated, that is if at least one item is NaN, the          
+corresponding min value will be NaN as well. To ignore NaN values            
+(MATLAB behavior), please use nanmin.                                        
+                                                                             
+Don't use `amin` for element-wise comparison of 2 arrays; when               
+``a.shape[0]`` is 2, ``minimum(a[0], a[1])`` is faster than                  
+``amin(a, axis=0)``.                                                         
+                                                                             
+Examples                                                                     
+--------                                                                     
+>>> a = reshape(arange(4),(2,2))                                          
+>>> a                                                                        
+([[0, 1],                                                               
+ [2, 3]])                                                              
+>>> amin(a)           # Minimum of the flattened array                    
+0                                                                            
+>>> amin(a, axis=0)   # Minima along the first axis                       
+([0, 1])                                                                
+>>> amin(a, axis=1)   # Minima along the second axis                      
+([0, 2])                                                                
+                                                                             
+>>> b = arange(5, dtype=float)                                         
+>>> b[2] = NaN                                                            
+>>> amin(b)                                                               
+nan                                                                         
