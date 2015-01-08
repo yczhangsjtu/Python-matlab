@@ -1,0 +1,2 @@
+Just like range() except it returns a array whose type can be specified   
+by the keyword argument dtype.
