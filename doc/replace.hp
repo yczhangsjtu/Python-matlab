@@ -1,0 +1,27 @@
+Help on function replace in module numpy.core.defchararray:
+
+replace(a, old, new, count=None)
+    For each element in `a`, return a copy of the string with all
+    occurrences of substring `old` replaced by `new`.
+    
+    Calls `str.replace` element-wise.
+    
+    Parameters
+    ----------
+    a : array-like of str or unicode
+    
+    old, new : str or unicode
+    
+    count : int, optional
+        If the optional argument `count` is given, only the first
+        `count` occurrences are replaced.
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of str or unicode, depending on input type
+    
+    See also
+    --------
+    str.replace
+

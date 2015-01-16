@@ -1,0 +1,3 @@
+Help on function disp in module numpy.lib.function_base:
+
+disp(variable) print the value of the variable.

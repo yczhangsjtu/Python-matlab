@@ -1,0 +1,23 @@
+Help on function istitle in module numpy.core.defchararray:
+
+istitle(a)
+    Returns true for each element if the element is a titlecased
+    string and there is at least one character, false otherwise.
+    
+    Call `str.istitle` element-wise.
+    
+    For 8-bit strings, this method is locale-dependent.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of bools
+    
+    See also
+    --------
+    str.istitle
+

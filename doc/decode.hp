@@ -1,0 +1,42 @@
+Help on function decode in module numpy.core.defchararray:
+
+decode(a, encoding=None, errors=None)
+    Calls `str.decode` element-wise.
+    
+    The set of available codecs comes from the Python standard library,
+    and may be extended at runtime.  For more information, see the
+    :mod:`codecs` module.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    encoding : str, optional
+       The name of an encoding
+    
+    errors : str, optional
+       Specifies how to handle encoding errors
+    
+    Returns
+    -------
+    out : ndarray
+    
+    See also
+    --------
+    str.decode
+    
+    Notes
+    -----
+    The type of the result will depend on the encoding specified.
+    
+    Examples
+    --------
+    >>> c = np.array(['aAaAaA', '  aA  ', 'abBABba'])
+    >>> c
+    array(['aAaAaA', '  aA  ', 'abBABba'],
+        dtype='|S7')
+    >>> np.char.encode(c, encoding='cp037')
+    array(['\x81\xc1\x81\xc1\x81\xc1', '@@\x81\xc1@@',
+        '\x81\x82\xc2\xc1\xc2\x82\x81'],
+        dtype='|S7')
+

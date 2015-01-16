@@ -1,0 +1,24 @@
+Help on function isupper in module numpy.core.defchararray:
+
+isupper(a)
+    Returns true for each element if all cased characters in the
+    string are uppercase and there is at least one character, false
+    otherwise.
+    
+    Call `str.isupper` element-wise.
+    
+    For 8-bit strings, this method is locale-dependent.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of bools
+    
+    See also
+    --------
+    str.isupper
+

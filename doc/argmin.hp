@@ -1,0 +1,10 @@
+Help on function argmin in module numpy.core.fromnumeric:
+
+argmin(a, axis=None)
+    Return the indices of the minimum values along an axis.
+    
+    See Also
+    --------
+    argmax : Similar function.  Please refer to `numpy.argmax` for detailed
+        documentation.
+

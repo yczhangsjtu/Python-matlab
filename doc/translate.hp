@@ -1,0 +1,27 @@
+Help on function translate in module numpy.core.defchararray:
+
+translate(a, table, deletechars=None)
+    For each element in `a`, return a copy of the string where all
+    characters occurring in the optional argument `deletechars` are
+    removed, and the remaining characters have been mapped through the
+    given translation table.
+    
+    Calls `str.translate` element-wise.
+    
+    Parameters
+    ----------
+    a : array-like of str or unicode
+    
+    table : str of length 256
+    
+    deletechars : str
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of str or unicode, depending on input type
+    
+    See also
+    --------
+    str.translate
+

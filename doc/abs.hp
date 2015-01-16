@@ -1,7 +1,7 @@
-  Compute the magnitude of Z.
+Help on built-in function abs in module __builtin__:
 
-  For example:
-
-  abs (-4.5)
-		=> 4.5
+abs(...)
+    abs(number) -> number
+    
+    Return the absolute value of the argument.
 

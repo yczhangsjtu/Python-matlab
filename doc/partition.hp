@@ -1,0 +1,31 @@
+Help on function partition in module numpy.core.defchararray:
+
+partition(a, sep)
+    Partition each element in `a` around `sep`.
+    
+    Calls `str.partition` element-wise.
+    
+    For each element in `a`, split the element as the first
+    occurrence of `sep`, and return 3 strings containing the part
+    before the separator, the separator itself, and the part after
+    the separator. If the separator is not found, return 3 strings
+    containing the string itself, followed by two empty strings.
+    
+    Parameters
+    ----------
+    a : array_like, {str, unicode}
+        Input array
+    sep : {str, unicode}
+        Separator to split each string element in `a`.
+    
+    Returns
+    -------
+    out : ndarray, {str, unicode}
+        Output array of str or unicode, depending on input type.
+        The output array will have an extra dimension with 3
+        elements per input element.
+    
+    See also
+    --------
+    str.partition
+

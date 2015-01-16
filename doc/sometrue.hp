@@ -1,0 +1,11 @@
+Help on function sometrue in module numpy.core.fromnumeric:
+
+sometrue(a, axis=None, out=None, keepdims=False)
+    Check whether some values are true.
+    
+    Refer to `any` for full documentation.
+    
+    See Also
+    --------
+    any : equivalent function
+

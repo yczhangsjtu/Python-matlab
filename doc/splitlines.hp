@@ -1,0 +1,25 @@
+Help on function splitlines in module numpy.core.defchararray:
+
+splitlines(a, keepends=None)
+    For each element in `a`, return a list of the lines in the
+    element, breaking at line boundaries.
+    
+    Calls `str.splitlines` element-wise.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    keepends : bool, optional
+        Line breaks are not included in the resulting list unless
+        keepends is given and true.
+    
+    Returns
+    -------
+    out : ndarray
+        Array of list objects
+    
+    See also
+    --------
+    str.splitlines
+

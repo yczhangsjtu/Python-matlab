@@ -1,0 +1,51 @@
+Help on built-in function fromstring in module numpy.core.multiarray:
+
+fromstring(...)
+    fromstring(string, dtype=float, count=-1, sep='')
+    
+    A new 1-D array initialized from raw binary or text data in a string.
+    
+    Parameters
+    ----------
+    string : str
+        A string containing the data.
+    dtype : data-type, optional
+        The data type of the array; default: float.  For binary input data,
+        the data must be in exactly this format.
+    count : int, optional
+        Read this number of `dtype` elements from the data.  If this is
+        negative (the default), the count will be determined from the
+        length of the data.
+    sep : str, optional
+        If not provided or, equivalently, the empty string, the data will
+        be interpreted as binary data; otherwise, as ASCII text with
+        decimal numbers.  Also in this latter case, this argument is
+        interpreted as the string separating numbers in the data; extra
+        whitespace between elements is also ignored.
+    
+    Returns
+    -------
+    arr : ndarray
+        The constructed array.
+    
+    Raises
+    ------
+    ValueError
+        If the string is not the correct size to satisfy the requested
+        `dtype` and `count`.
+    
+    See Also
+    --------
+    frombuffer, fromfile, fromiter
+    
+    Examples
+    --------
+    >>> np.fromstring('\x01\x02', dtype=np.uint8)
+    array([1, 2], dtype=uint8)
+    >>> np.fromstring('1 2', dtype=int, sep=' ')
+    array([1, 2])
+    >>> np.fromstring('1, 2', dtype=int, sep=',')
+    array([1, 2])
+    >>> np.fromstring('\x01\x02\x03\x04\x05', dtype=np.uint8, count=3)
+    array([1, 2, 3], dtype=uint8)
+

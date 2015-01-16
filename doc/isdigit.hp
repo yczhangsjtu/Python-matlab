@@ -1,0 +1,23 @@
+Help on function isdigit in module numpy.core.defchararray:
+
+isdigit(a)
+    Returns true for each element if all characters in the string are
+    digits and there is at least one character, false otherwise.
+    
+    Calls `str.isdigit` element-wise.
+    
+    For 8-bit strings, this method is locale-dependent.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of bools
+    
+    See also
+    --------
+    str.isdigit
+

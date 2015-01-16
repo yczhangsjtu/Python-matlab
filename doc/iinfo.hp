@@ -1,0 +1,70 @@
+Help on class iinfo in module numpy.core.getlimits:
+
+class iinfo(__builtin__.object)
+ |  iinfo(type)
+ |  
+ |  Machine limits for integer types.
+ |  
+ |  Attributes
+ |  ----------
+ |  min : int
+ |      The smallest integer expressible by the type.
+ |  max : int
+ |      The largest integer expressible by the type.
+ |  
+ |  Parameters
+ |  ----------
+ |  type : integer type, dtype, or instance
+ |      The kind of integer data type to get information about.
+ |  
+ |  See Also
+ |  --------
+ |  finfo : The equivalent for floating point data types.
+ |  
+ |  Examples
+ |  --------
+ |  With types:
+ |  
+ |  >>> ii16 = np.iinfo(np.int16)
+ |  >>> ii16.min
+ |  -32768
+ |  >>> ii16.max
+ |  32767
+ |  >>> ii32 = np.iinfo(np.int32)
+ |  >>> ii32.min
+ |  -2147483648
+ |  >>> ii32.max
+ |  2147483647
+ |  
+ |  With instances:
+ |  
+ |  >>> ii32 = np.iinfo(np.int32(10))
+ |  >>> ii32.min
+ |  -2147483648
+ |  >>> ii32.max
+ |  2147483647
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, int_type)
+ |  
+ |  __repr__(self)
+ |  
+ |  __str__(self)
+ |      String representation.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+ |  
+ |  max
+ |      Maximum value of given dtype.
+ |  
+ |  min
+ |      Minimum value of given dtype.
+

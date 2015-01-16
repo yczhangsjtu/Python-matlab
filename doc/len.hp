@@ -1,0 +1,7 @@
+Help on built-in function len in module __builtin__:
+
+len(...)
+    len(object) -> integer
+    
+    Return the number of items of a sequence or mapping.
+

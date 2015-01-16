@@ -1,0 +1,9 @@
+Help on built-in function max in module __builtin__:
+
+max(...)
+    max(iterable[, key=func]) -> value
+    max(a, b, c, ...[, key=func]) -> value
+    
+    With a single iterable argument, return its largest item.
+    With two or more arguments, return the largest argument.
+

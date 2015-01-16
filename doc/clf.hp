@@ -1,0 +1,5 @@
+Help on function clf in module matplotlib.pyplot:
+
+clf()
+    Clear the current figure.
+

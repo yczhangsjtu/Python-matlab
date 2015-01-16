@@ -1,0 +1,24 @@
+Help on function islower in module numpy.core.defchararray:
+
+islower(a)
+    Returns true for each element if all cased characters in the
+    string are lowercase and there is at least one cased character,
+    false otherwise.
+    
+    Calls `str.islower` element-wise.
+    
+    For 8-bit strings, this method is locale-dependent.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of bools
+    
+    See also
+    --------
+    str.islower
+

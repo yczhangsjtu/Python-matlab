@@ -1,0 +1,27 @@
+Help on method plot_surface in module mpl_toolkits.mplot3d.axes3d:
+
+plot_surface(self, X, Y, Z, *args, **kwargs) unbound mpl_toolkits.mplot3d.axes3d.Axes3D method
+    Create a surface plot.
+    
+    By default it will be colored in shades of a solid color,
+    but it also supports color mapping by supplying the *cmap*
+    argument.
+    
+    ============= ================================================
+    Argument      Description
+    ============= ================================================
+    *X*, *Y*, *Z* Data values as 2D arrays
+    *rstride*     Array row stride (step size)
+    *cstride*     Array column stride (step size)
+    *color*       Color of the surface patches
+    *cmap*        A colormap for the surface patches.
+    *facecolors*  Face colors for the individual patches
+    *norm*        An instance of Normalize to map values to colors
+    *vmin*        Minimum value to map
+    *vmax*        Maximum value to map
+    *shade*       Whether to shade the facecolors
+    ============= ================================================
+    
+    Other arguments are passed on to
+    :class:`~mpl_toolkits.mplot3d.art3d.Poly3DCollection`
+

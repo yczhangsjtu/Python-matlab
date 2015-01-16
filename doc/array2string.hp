@@ -1,0 +1,90 @@
+Help on function array2string in module numpy.core.arrayprint:
+
+array2string(a, max_line_width=None, precision=None, suppress_small=None, separator=' ', prefix='', style=<built-in function repr>, formatter=None)
+    Return a string representation of an array.
+    
+    Parameters
+    ----------
+    a : ndarray
+        Input array.
+    max_line_width : int, optional
+        The maximum number of columns the string should span. Newline
+        characters splits the string appropriately after array elements.
+    precision : int, optional
+        Floating point precision. Default is the current printing
+        precision (usually 8), which can be altered using `set_printoptions`.
+    suppress_small : bool, optional
+        Represent very small numbers as zero. A number is "very small" if it
+        is smaller than the current printing precision.
+    separator : str, optional
+        Inserted between elements.
+    prefix : str, optional
+        An array is typically printed as::
+    
+          'prefix(' + array2string(a) + ')'
+    
+        The length of the prefix string is used to align the
+        output correctly.
+    style : function, optional
+        A function that accepts an ndarray and returns a string.  Used only
+        when the shape of `a` is equal to ``()``, i.e. for 0-D arrays.
+    formatter : dict of callables, optional
+        If not None, the keys should indicate the type(s) that the respective
+        formatting function applies to.  Callables should return a string.
+        Types that are not specified (by their corresponding keys) are handled
+        by the default formatters.  Individual types for which a formatter
+        can be set are::
+    
+            - 'bool'
+            - 'int'
+            - 'timedelta' : a `numpy.timedelta64`
+            - 'datetime' : a `numpy.datetime64`
+            - 'float'
+            - 'longfloat' : 128-bit floats
+            - 'complexfloat'
+            - 'longcomplexfloat' : composed of two 128-bit floats
+            - 'numpy_str' : types `numpy.string_` and `numpy.unicode_`
+            - 'str' : all other strings
+    
+        Other keys that can be used to set a group of types at once are::
+    
+            - 'all' : sets all types
+            - 'int_kind' : sets 'int'
+            - 'float_kind' : sets 'float' and 'longfloat'
+            - 'complex_kind' : sets 'complexfloat' and 'longcomplexfloat'
+            - 'str_kind' : sets 'str' and 'numpystr'
+    
+    Returns
+    -------
+    array_str : str
+        String representation of the array.
+    
+    Raises
+    ------
+    TypeError
+        if a callable in `formatter` does not return a string.
+    
+    See Also
+    --------
+    array_str, array_repr, set_printoptions, get_printoptions
+    
+    Notes
+    -----
+    If a formatter is specified for a certain type, the `precision` keyword is
+    ignored for that type.
+    
+    Examples
+    --------
+    >>> x = np.array([1e-16,1,2,3])
+    >>> print np.array2string(x, precision=2, separator=',',
+    ...                       suppress_small=True)
+    [ 0., 1., 2., 3.]
+    
+    >>> x  = np.arange(3.)
+    >>> np.array2string(x, formatter={'float_kind':lambda x: "%.2f" % x})
+    '[0.00 1.00 2.00]'
+    
+    >>> x  = np.arange(3)
+    >>> np.array2string(x, formatter={'int':lambda x: hex(x)})
+    '[0x0L 0x1L 0x2L]'
+

@@ -1,0 +1,25 @@
+Help on function get_printoptions in module numpy.core.arrayprint:
+
+get_printoptions()
+    Return the current print options.
+    
+    Returns
+    -------
+    print_opts : dict
+        Dictionary of current print options with keys
+    
+          - precision : int
+          - threshold : int
+          - edgeitems : int
+          - linewidth : int
+          - suppress : bool
+          - nanstr : str
+          - infstr : str
+          - formatter : dict of callables
+    
+        For a full description of these options, see `set_printoptions`.
+    
+    See Also
+    --------
+    set_printoptions, set_string_function
+

@@ -1,0 +1,40 @@
+Help on function endswith in module numpy.core.defchararray:
+
+endswith(a, suffix, start=0, end=None)
+    Returns a boolean array which is `True` where the string element
+    in `a` ends with `suffix`, otherwise `False`.
+    
+    Calls `str.endswith` element-wise.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    suffix : str
+    
+    start, end : int, optional
+        With optional `start`, test beginning at that position. With
+        optional `end`, stop comparing at that position.
+    
+    Returns
+    -------
+    out : ndarray
+        Outputs an array of bools.
+    
+    See also
+    --------
+    str.endswith
+    
+    Examples
+    --------
+    >>> s = np.array(['foo', 'bar'])
+    >>> s[0] = 'foo'
+    >>> s[1] = 'bar'
+    >>> s
+    array(['foo', 'bar'],
+        dtype='|S3')
+    >>> np.char.endswith(s, 'ar')
+    array([False,  True], dtype=bool)
+    >>> np.char.endswith(s, 'a', start=1, end=2)
+    array([False,  True], dtype=bool)
+

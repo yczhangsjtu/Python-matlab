@@ -1,0 +1,25 @@
+Help on function rindex in module numpy.core.defchararray:
+
+rindex(a, sub, start=0, end=None)
+    Like `rfind`, but raises `ValueError` when the substring `sub` is
+    not found.
+    
+    Calls `str.rindex` element-wise.
+    
+    Parameters
+    ----------
+    a : array-like of str or unicode
+    
+    sub : str or unicode
+    
+    start, end : int, optional
+    
+    Returns
+    -------
+    out : ndarray
+       Output array of ints.
+    
+    See also
+    --------
+    rfind, str.rindex
+

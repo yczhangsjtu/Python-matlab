@@ -1,5 +1,9 @@
-Check if all elements of input array are true.                               
-                                                                             
-See Also                                                                     
---------                                                                     
-all : Equivalent function; see for details.                           
+Help on function alltrue in module numpy.core.fromnumeric:
+
+alltrue(a, axis=None, out=None, keepdims=False)
+    Check if all elements of input array are true.
+    
+    See Also
+    --------
+    numpy.all : Equivalent function; see for details.
+

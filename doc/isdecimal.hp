@@ -1,0 +1,26 @@
+Help on function isdecimal in module numpy.core.defchararray:
+
+isdecimal(a)
+    For each element, return True if there are only decimal
+    characters in the element.
+    
+    Calls `unicode.isdecimal` element-wise.
+    
+    Decimal characters include digit characters, and all characters
+    that that can be used to form decimal-radix numbers,
+    e.g. ``U+0660, ARABIC-INDIC DIGIT ZERO``.
+    
+    Parameters
+    ----------
+    a : array_like, unicode
+        Input array.
+    
+    Returns
+    -------
+    out : ndarray, bool
+        Array of booleans identical in shape to `a`.
+    
+    See also
+    --------
+    unicode.isdecimal
+

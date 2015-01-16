@@ -1,0 +1,18 @@
+Help on function str_len in module numpy.core.defchararray:
+
+str_len(a)
+    Return len(a) element-wise.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    Returns
+    -------
+    out : ndarray
+        Output array of integers
+    
+    See also
+    --------
+    __builtin__.len
+

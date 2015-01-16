@@ -1,0 +1,4 @@
+  File "<string>", line 1
+    from numpy import *^Mfrom pylab import *^Mimport numpy.core.defchararray as char^Mhelp(char.zfill)
+                       ^
+SyntaxError: invalid syntax

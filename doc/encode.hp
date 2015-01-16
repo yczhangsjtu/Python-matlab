@@ -1,0 +1,31 @@
+Help on function encode in module numpy.core.defchararray:
+
+encode(a, encoding=None, errors=None)
+    Calls `str.encode` element-wise.
+    
+    The set of available codecs comes from the Python standard library,
+    and may be extended at runtime. For more information, see the codecs
+    module.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    encoding : str, optional
+       The name of an encoding
+    
+    errors : str, optional
+       Specifies how to handle encoding errors
+    
+    Returns
+    -------
+    out : ndarray
+    
+    See also
+    --------
+    str.encode
+    
+    Notes
+    -----
+    The type of the result will depend on the encoding specified.
+

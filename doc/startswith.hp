@@ -1,0 +1,27 @@
+Help on function startswith in module numpy.core.defchararray:
+
+startswith(a, prefix, start=0, end=None)
+    Returns a boolean array which is `True` where the string element
+    in `a` starts with `prefix`, otherwise `False`.
+    
+    Calls `str.startswith` element-wise.
+    
+    Parameters
+    ----------
+    a : array_like of str or unicode
+    
+    prefix : str
+    
+    start, end : int, optional
+        With optional `start`, test beginning at that position. With
+        optional `end`, stop comparing at that position.
+    
+    Returns
+    -------
+    out : ndarray
+        Array of booleans
+    
+    See also
+    --------
+    str.startswith
+

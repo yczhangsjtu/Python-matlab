@@ -1,0 +1,37 @@
+Help on built-in function frombuffer in module numpy.core.multiarray:
+
+frombuffer(...)
+    frombuffer(buffer, dtype=float, count=-1, offset=0)
+    
+    Interpret a buffer as a 1-dimensional array.
+    
+    Parameters
+    ----------
+    buffer : buffer_like
+        An object that exposes the buffer interface.
+    dtype : data-type, optional
+        Data-type of the returned array; default: float.
+    count : int, optional
+        Number of items to read. ``-1`` means all data in the buffer.
+    offset : int, optional
+        Start reading the buffer from this offset; default: 0.
+    
+    Notes
+    -----
+    If the buffer has data that is not in machine byte-order, this should
+    be specified as part of the data-type, e.g.::
+    
+      >>> dt = np.dtype(int)
+      >>> dt = dt.newbyteorder('>')
+      >>> np.frombuffer(buf, dtype=dt)
+    
+    The data of the resulting array will not be byteswapped, but will be
+    interpreted correctly.
+    
+    Examples
+    --------
+    >>> s = 'hello world'
+    >>> np.frombuffer(s, dtype='S1', count=5, offset=6)
+    array(['w', 'o', 'r', 'l', 'd'],
+          dtype='|S1')
+

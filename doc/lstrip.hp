@@ -1,0 +1,53 @@
+Help on function lstrip in module numpy.core.defchararray:
+
+lstrip(a, chars=None)
+    For each element in `a`, return a copy with the leading characters
+    removed.
+    
+    Calls `str.lstrip` element-wise.
+    
+    Parameters
+    ----------
+    a : array-like, {str, unicode}
+        Input array.
+    
+    chars : {str, unicode}, optional
+        The `chars` argument is a string specifying the set of
+        characters to be removed. If omitted or None, the `chars`
+        argument defaults to removing whitespace. The `chars` argument
+        is not a prefix; rather, all combinations of its values are
+        stripped.
+    
+    Returns
+    -------
+    out : ndarray, {str, unicode}
+        Output array of str or unicode, depending on input type
+    
+    See also
+    --------
+    str.lstrip
+    
+    Examples
+    --------
+    >>> c = np.array(['aAaAaA', '  aA  ', 'abBABba'])
+    >>> c
+    array(['aAaAaA', '  aA  ', 'abBABba'],
+        dtype='|S7')
+    
+    The 'a' variable is unstripped from c[1] because whitespace leading.
+    
+    >>> np.char.lstrip(c, 'a')
+    array(['AaAaA', '  aA  ', 'bBABba'],
+        dtype='|S7')
+    
+    
+    >>> np.char.lstrip(c, 'A') # leaves c unchanged
+    array(['aAaAaA', '  aA  ', 'abBABba'],
+        dtype='|S7')
+    >>> (np.char.lstrip(c, ' ') == np.char.lstrip(c, '')).all()
+    ... # XXX: is this a regression? this line now returns False
+    ... # np.char.lstrip(c,'') does not modify c at all.
+    True
+    >>> (np.char.lstrip(c, ' ') == np.char.lstrip(c, None)).all()
+    True
+

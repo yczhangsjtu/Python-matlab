@@ -1,0 +1,192 @@
+Help on class poly1d in module numpy.lib.polynomial:
+
+class poly1d(__builtin__.object)
+ |  A one-dimensional polynomial class.
+ |  
+ |  A convenience class, used to encapsulate "natural" operations on
+ |  polynomials so that said operations may take on their customary
+ |  form in code (see Examples).
+ |  
+ |  Parameters
+ |  ----------
+ |  c_or_r : array_like
+ |      The polynomial's coefficients, in decreasing powers, or if
+ |      the value of the second parameter is True, the polynomial's
+ |      roots (values where the polynomial evaluates to 0).  For example,
+ |      ``poly1d([1, 2, 3])`` returns an object that represents
+ |      :math:`x^2 + 2x + 3`, whereas ``poly1d([1, 2, 3], True)`` returns
+ |      one that represents :math:`(x-1)(x-2)(x-3) = x^3 - 6x^2 + 11x -6`.
+ |  r : bool, optional
+ |      If True, `c_or_r` specifies the polynomial's roots; the default
+ |      is False.
+ |  variable : str, optional
+ |      Changes the variable used when printing `p` from `x` to `variable`
+ |      (see Examples).
+ |  
+ |  Examples
+ |  --------
+ |  Construct the polynomial :math:`x^2 + 2x + 3`:
+ |  
+ |  >>> p = np.poly1d([1, 2, 3])
+ |  >>> print np.poly1d(p)
+ |     2
+ |  1 x + 2 x + 3
+ |  
+ |  Evaluate the polynomial at :math:`x = 0.5`:
+ |  
+ |  >>> p(0.5)
+ |  4.25
+ |  
+ |  Find the roots:
+ |  
+ |  >>> p.r
+ |  array([-1.+1.41421356j, -1.-1.41421356j])
+ |  >>> p(p.r)
+ |  array([ -4.44089210e-16+0.j,  -4.44089210e-16+0.j])
+ |  
+ |  These numbers in the previous line represent (0, 0) to machine precision
+ |  
+ |  Show the coefficients:
+ |  
+ |  >>> p.c
+ |  array([1, 2, 3])
+ |  
+ |  Display the order (the leading zero-coefficients are removed):
+ |  
+ |  >>> p.order
+ |  2
+ |  
+ |  Show the coefficient of the k-th power in the polynomial
+ |  (which is equivalent to ``p.c[-(i+1)]``):
+ |  
+ |  >>> p[1]
+ |  2
+ |  
+ |  Polynomials can be added, subtracted, multiplied, and divided
+ |  (returns quotient and remainder):
+ |  
+ |  >>> p * p
+ |  poly1d([ 1,  4, 10, 12,  9])
+ |  
+ |  >>> (p**3 + 4) / p
+ |  (poly1d([  1.,   4.,  10.,  12.,   9.]), poly1d([ 4.]))
+ |  
+ |  ``asarray(p)`` gives the coefficient array, so polynomials can be
+ |  used in all functions that accept arrays:
+ |  
+ |  >>> p**2 # square of polynomial
+ |  poly1d([ 1,  4, 10, 12,  9])
+ |  
+ |  >>> np.square(p) # square of individual coefficients
+ |  array([1, 4, 9])
+ |  
+ |  The variable used in the string representation of `p` can be modified,
+ |  using the `variable` parameter:
+ |  
+ |  >>> p = np.poly1d([1,2,3], variable='z')
+ |  >>> print p
+ |     2
+ |  1 z + 2 z + 3
+ |  
+ |  Construct a polynomial from its roots:
+ |  
+ |  >>> np.poly1d([1, 2], True)
+ |  poly1d([ 1, -3,  2])
+ |  
+ |  This is the same polynomial as obtained by:
+ |  
+ |  >>> np.poly1d([1, -1]) * np.poly1d([1, -2])
+ |  poly1d([ 1, -3,  2])
+ |  
+ |  Methods defined here:
+ |  
+ |  __add__(self, other)
+ |  
+ |  __array__(self, t=None)
+ |  
+ |  __call__(self, val)
+ |  
+ |  __div__(self, other)
+ |  
+ |  __eq__(self, other)
+ |  
+ |  __getattr__(self, key)
+ |  
+ |  __getitem__(self, val)
+ |  
+ |  __init__(self, c_or_r, r=0, variable=None)
+ |  
+ |  __iter__(self)
+ |  
+ |  __len__(self)
+ |  
+ |  __mul__(self, other)
+ |  
+ |  __ne__(self, other)
+ |  
+ |  __neg__(self)
+ |  
+ |  __pos__(self)
+ |  
+ |  __pow__(self, val)
+ |  
+ |  __radd__(self, other)
+ |  
+ |  __rdiv__(self, other)
+ |  
+ |  __repr__(self)
+ |  
+ |  __rmul__(self, other)
+ |  
+ |  __rsub__(self, other)
+ |  
+ |  __rtruediv__ = __rdiv__(self, other)
+ |  
+ |  __setattr__(self, key, val)
+ |  
+ |  __setitem__(self, key, val)
+ |  
+ |  __str__(self)
+ |  
+ |  __sub__(self, other)
+ |  
+ |  __truediv__ = __div__(self, other)
+ |  
+ |  deriv(self, m=1)
+ |      Return a derivative of this polynomial.
+ |      
+ |      Refer to `polyder` for full documentation.
+ |      
+ |      See Also
+ |      --------
+ |      polyder : equivalent function
+ |  
+ |  integ(self, m=1, k=0)
+ |      Return an antiderivative (indefinite integral) of this polynomial.
+ |      
+ |      Refer to `polyint` for full documentation.
+ |      
+ |      See Also
+ |      --------
+ |      polyint : equivalent function
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes defined here:
+ |  
+ |  __hash__ = None
+ |  
+ |  coeffs = None
+ |  
+ |  order = None
+ |  
+ |  variable = None
+
